@@ -1,0 +1,166 @@
+================================================================================
+BROWSER BACKGROUND LAUNCHER
+================================================================================
+Log file: G:\mroya\browser_test.log
+================================================================================
+[run_browser] Added imp module stub for Python 3.12+ compatibility
+[run_browser] Added ftrack_inout dependencies to sys.path: G:\mroya\ftrack_plugins\ftrack_inout\dependencies
+[run_browser] Added multi-site-location dependencies to sys.path: G:\mroya\ftrack_plugins\multi-site-location-0.2.0\dependencies
+[run_browser] [OK] ftrack_api is available after bootstrap
+[run_browser] ---- AWS-related environment after bootstrap ----
+[run_browser] AWS_ACCESS_KEY_ID='356X...BGC7'
+[run_browser] AWS_SECRET_ACCESS_KEY='Xwtu...qvSX'
+[run_browser] AWS_SESSION_TOKEN=<not set>
+[run_browser] AWS_PROFILE=<not set>
+[run_browser] -------------------------------------------------
+11:53:36 - INFO:ftrack_inout.browser.browser_widget:[INFO] Transfer feature will still work via TransferWorker -> mroya.transfer.request event
+[OK] Using Ftrack Browser with OptimizedFtrackApiClient
+[ftrack_inout.browser] [OK] UserTasksWidget imported successfully
+[run_browser] [OK] Successfully imported FtrackBrowser from ftrack_inout.browser
+[run_browser] Creating FtrackBrowser widget...
+11:53:36 - INFO:ftrack_inout.browser.browser_widget_optimized:[LAUNCH] Initializing Optimized Ftrack API Client...
+11:53:36 - INFO:ftrack_inout.browser.browser_widget_optimized:[CLIP] MODULE VERSION: 2.3.0 (Updated: 2024-12-19 13:10:00)
+11:53:36 - INFO:ftrack_inout.browser.browser_widget_optimized:🔧 This is the UPDATED version with all API methods
+11:53:36 - INFO:ftrack_inout.browser.browser_widget_optimized:[SEARCH] Available methods: ['clear_cache', 'clear_cache_for_entity', 'diagnose_performance', 'get_all_versions_for_multiple_assets', 'get_asset_versions', 'get_assets', 'get_assets_for_task', 'get_assets_linked_to_entity', 'get_cache_stats', 'get_children', 'get_components_with_paths_for_version', 'get_entity', 'get_folders', 'get_project_from_context_id', 'get_projects', 'get_scenes', 'get_sequences', 'get_shot_custom_attributes_on_demand', 'get_shots', 'get_tasks_for_entity', 'get_version_components', 'get_versions_for_asset', 'get_versions_for_asset_and_task', 'load_asset_versions_for_entity_optimized', 'preload_project_data', 'refresh_single_version', 'restore_performance']
+[LAUNCH] STARTING TRUE BULK CACHE PRELOAD...
+[OK] FileCache found: <class 'ftrack_api.cache.FileCache'>
+[OK] MemoryCacheWrapper found: <class 'ftrack_api.cache.MemoryCache'>
+[FOLDER] DBM file path: X:\ftrack_cache\ftrack_cache_db
+🔥 TRUE BULK LOADING: Reading entire DBM file to memory...
+📖 DBM file opened successfully
+💾 Direct memory access established
+[REFRESH] Loading ALL keys in ONE operation...
+[SEARCH] Sample key 1: '('Location', ['ce9b348f-8809-11e3-821c-20c9d081909b'])'
+[SEARCH] Sample key 2: '('Location', ['cb268ecc-8809-11e3-a7e2-20c9d081909b'])'
+[SEARCH] Sample key 3: '('Location', ['cd41be70-8809-11e3-b98a-20c9d081909b'])'
+[SEARCH] Sample key 4: '('Location', ['3a372bde-05bc-11e4-8908-20c9d081909b'])'
+[SEARCH] Sample key 5: '('Location', ['1f454983-6edb-410e-93ac-366a0fe1af27'])'
+📚 Read 6785 items from DBM in 223.2ms
+💾 Wrote 6785 items to memory in 43.8ms
+🎉 TRUE BULK LOADING COMPLETED!
+[OK] TRUE BULK PRELOAD COMPLETED!
+[STATS] Loaded 6785 keys in 310.9ms
+[FAST] Average: 0.05ms per key
+11:53:38 - INFO:ftrack_inout.browser.browser_widget_optimized:[OK] Using optimized components
+11:53:38 - INFO:ftrack_inout.browser.browser_widget_optimized:[OK] All critical methods available: ['get_folders', 'get_assets', 'get_shots', 'clear_cache']
+11:53:38 - INFO:ftrack_inout.browser.browser_widget:[OK] Successfully loaded HDA parameter config from G:\mroya\ftrack_plugins\ftrack_inout\browser\hda_params_config.yaml
+11:53:38 - INFO:ftrack_inout.browser.browser_widget:HDA param config loaded: {'task_id': ['task_Id', 'taskid', 'TaskId', 'task_id'], 'asset_version_id': ['assetversionid', 'AssetVersionId', 'AssetVersion'], 'component_name': ['componentname', 'ComponentName'], 'component_id': ['componentid', 'ComponentId'], 'asset_id': ['assetid', 'AssetId', 'asset_id'], 'asset_name': ['assetname', 'AssetName', 'asset_name'], 'asset_type': ['assettype', 'AssetType', 'asset_type', 'type']}
+11:53:40 - WARNING:ftrack_inout.browser.browser_widget_optimized:SimpleFtrackApiClient.get_projects returned empty list, using fallback
+11:53:40 - INFO:ftrack_inout.browser.browser_widget_optimized:Using fallback direct query for projects
+11:53:40 - INFO:ftrack_inout.browser.browser_widget:Starting to load tree (lazy)...
+11:53:40 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=False, hda_params=False
+11:53:40 - INFO:ftrack_inout.browser.browser_widget:Project item added. Tree ready for expansion.
+11:53:40 - INFO:ftrack_inout.browser.browser_widget:Starting to load tree (lazy)...
+11:53:40 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=False, hda_params=False
+11:53:40 - INFO:ftrack_inout.browser.browser_widget:Project item added. Tree ready for expansion.
+11:53:41 - INFO:ftrack_inout.browser.browser_widget:Found 8 accessible locations out of 45 total.
+11:53:41 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=False, hda_params=False
+11:53:41 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=False, hda_params=False
+11:53:41 - INFO:ftrack_inout.browser.browser_widget:Loaded 4 final locations into UI.
+11:53:41 - INFO:ftrack_inout.browser.browser_widget:[OK] DETECTED ACCESSIBLE LOCATIONS ON THIS MACHINE: ['burlin home', 'burlin.backup', 's3.studio.storage', 'x:/proj/']
+[run_browser] [OK] Browser window opened
+11:53:58 - INFO:ftrack_inout.browser.browser_widget:Expanding item: bp49 (ID: 114fe22f-4b61-47be-a617-21059df458be, Type: Project)
+11:53:58 - INFO:ftrack_inout.browser.browser_widget:Fetching children for Project ID: 114fe22f-4b61-47be-a617-21059df458be
+11:53:58 - INFO:ftrack_inout.browser.browser_widget_optimized:[SEARCH] Executing query: select id, name, description from Folder where parent.id is "114fe22f-4b61-47be-a617-21059df458be"
+11:53:59 - INFO:ftrack_inout.browser.browser_widget_optimized:[FOLDER] Found 3 folders for parent 114fe22f-4b61-47be-a617-21059df458be
+11:53:59 - INFO:ftrack_inout.browser.browser_widget_optimized:  [FOLDER] Folder: assets (ID: 4b1d213e-2f5a-445e-91e6-46abaeb93b01)
+11:53:59 - INFO:ftrack_inout.browser.browser_widget_optimized:  [FOLDER] Folder: edit (ID: f225b703-1903-4d57-b27f-39e79008d1d1)
+11:53:59 - INFO:ftrack_inout.browser.browser_widget_optimized:  [FOLDER] Folder: shots (ID: c98a2060-c68a-4c3b-bec1-ca9c4186da7d)
+11:53:59 - INFO:ftrack_inout.browser.browser_widget_optimized:[SEARCH] Executing query: select id, name, description from AssetBuild where parent.id is "114fe22f-4b61-47be-a617-21059df458be"
+11:53:59 - INFO:ftrack_inout.browser.browser_widget_optimized:[TARGET] Found 0 assets for parent 114fe22f-4b61-47be-a617-21059df458be
+11:53:59 - INFO:ftrack_inout.browser.browser_widget_optimized:[SEARCH] Executing query: select id, name, description from Sequence where parent.id is "114fe22f-4b61-47be-a617-21059df458be"
+11:53:59 - INFO:ftrack_inout.browser.browser_widget_optimized:🎬 Found 0 sequences for parent 114fe22f-4b61-47be-a617-21059df458be
+11:54:00 - INFO:ftrack_inout.browser.browser_widget:Expanding item: shots (ID: c98a2060-c68a-4c3b-bec1-ca9c4186da7d, Type: Folder)
+11:54:00 - INFO:ftrack_inout.browser.browser_widget:Fetching children for Folder ID: c98a2060-c68a-4c3b-bec1-ca9c4186da7d
+11:54:00 - INFO:ftrack_inout.browser.browser_widget_optimized:[SEARCH] Executing query: select id, name, description from Folder where parent.id is "c98a2060-c68a-4c3b-bec1-ca9c4186da7d"
+11:54:00 - INFO:ftrack_inout.browser.browser_widget_optimized:[FOLDER] Found 0 folders for parent c98a2060-c68a-4c3b-bec1-ca9c4186da7d
+11:54:00 - INFO:ftrack_inout.browser.browser_widget_optimized:[SEARCH] Executing query: select id, name, description from AssetBuild where parent.id is "c98a2060-c68a-4c3b-bec1-ca9c4186da7d"
+11:54:00 - INFO:ftrack_inout.browser.browser_widget_optimized:[TARGET] Found 0 assets for parent c98a2060-c68a-4c3b-bec1-ca9c4186da7d
+11:54:00 - INFO:ftrack_inout.browser.browser_widget_optimized:[SEARCH] Executing query: select id, name, description from Sequence where parent.id is "c98a2060-c68a-4c3b-bec1-ca9c4186da7d"
+11:54:00 - INFO:ftrack_inout.browser.browser_widget_optimized:🎬 Found 0 sequences for parent c98a2060-c68a-4c3b-bec1-ca9c4186da7d
+TypeError: FtrackTaskBrowser.on_item_selected() missing 2 required positional arguments: 'item' and 'column'
+11:54:03 - INFO:ftrack_inout.browser.browser_widget:Item selected: bp49_sh0030 (Type: Shot, ID: b48a5ebe-d0b7-4987-a20b-425f86782f18)
+11:54:03 - INFO:ftrack_inout.browser.browser_widget_optimized:Fetching custom attributes on-demand for Shot ID: b48a5ebe-d0b7-4987-a20b-425f86782f18
+11:54:04 - INFO:ftrack_inout.browser.browser_widget_optimized:Successfully fetched on-demand attributes for shot b48a5ebe-d0b7-4987-a20b-425f86782f18: {'name': 'bp49_sh0030', 'description': '', 'fstart': 1001.0, 'fend': 1100.0, 'handles': 0.0, 'preroll': 0.0, 'fps': 25.0}
+11:54:06 - INFO:ftrack_inout.browser.browser_widget:Entity selected, using as context: Shot ID b48a5ebe-d0b7-4987-a20b-425f86782f18
+11:54:06 - INFO:ftrack_inout.browser.browser_widget:Processing selection: Shot b48a5ebe-d0b7-4987-a20b-425f86782f18
+11:54:06 - INFO:ftrack_inout.browser.browser_widget:Loading assets for entity ID: b48a5ebe-d0b7-4987-a20b-425f86782f18
+11:54:06 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=False, hda_params=False
+11:54:06 - INFO:ftrack_inout.browser.browser_widget:Fetching assets linked to entity b48a5ebe-d0b7-4987-a20b-425f86782f18
+11:54:06 - INFO:ftrack_inout.browser.browser_widget_optimized:[LAUNCH] OPTIMIZED: Fetching assets for entity b48a5ebe-d0b7-4987-a20b-425f86782f18
+11:54:07 - INFO:ftrack_inout.browser.browser_widget_optimized:[CLIP] Found 3 asset IDs in 0.389s
+11:54:08 - INFO:ftrack_inout.browser.browser_widget_optimized:[OK] OPTIMIZED: 3 assets loaded in 1.379s
+11:54:08 - INFO:ftrack_inout.browser.browser_widget_optimized:   [STATS] Query: 0.389s, Batch get: 0.991s (cached: 0)
+11:54:08 - INFO:ftrack_inout.browser.browser_widget_optimized:   [LAUNCH] Speed: 2.2 assets/sec
+11:54:08 - INFO:ftrack_inout.browser.browser_widget:[LAUNCH] LAZY LOADING: Showing 3 assets (versions loaded on demand)
+11:54:08 - INFO:ftrack_inout.browser.browser_widget_optimized:Fetching custom attributes on-demand for Shot ID: b48a5ebe-d0b7-4987-a20b-425f86782f18
+11:54:08 - INFO:ftrack_inout.browser.browser_widget_optimized:Successfully fetched on-demand attributes for shot b48a5ebe-d0b7-4987-a20b-425f86782f18: {'name': 'bp49_sh0030', 'description': '', 'fstart': 1001.0, 'fend': 1100.0, 'handles': 0.0, 'preroll': 0.0, 'fps': 25.0}
+11:54:08 - INFO:ftrack_inout.browser.browser_widget:Expanding item: bp49_sh0030 (ID: b48a5ebe-d0b7-4987-a20b-425f86782f18, Type: Shot)
+11:54:08 - INFO:ftrack_inout.browser.browser_widget:Fetching children for Shot ID: b48a5ebe-d0b7-4987-a20b-425f86782f18
+11:54:11 - INFO:ftrack_inout.browser.browser_widget:Asset item expanded: ID 4f23ecbe-226b-411d-8807-66bf1f477492. Triggering version loading.
+11:54:11 - INFO:ftrack_inout.browser.browser_widget:[REFRESH] Loading versions for asset 4f23ecbe-226b-411d-8807-66bf1f477492...
+11:54:11 - INFO:ftrack_inout.browser.browser_widget_optimized:[LAUNCH] OPTIMIZED: Fetching versions for asset 4f23ecbe-226b-411d-8807-66bf1f477492 (force_refresh=False)
+11:54:11 - INFO:ftrack_inout.browser.browser_widget_optimized:[CLIP] Found 0 versions via relationship in 0.128s
+11:54:11 - INFO:ftrack_inout.browser.browser_widget_optimized:[OK] No versions found for asset 4f23ecbe-226b-411d-8807-66bf1f477492
+11:54:11 - INFO:ftrack_inout.browser.browser_widget:Asset item expanded: ID 4f23ecbe-226b-411d-8807-66bf1f477492. Triggering version loading.
+11:54:11 - INFO:ftrack_inout.browser.browser_widget:Versions already loaded in UI for asset 4f23ecbe-226b-411d-8807-66bf1f477492
+11:54:12 - INFO:ftrack_inout.browser.browser_widget:Asset selected: ID 4f23ecbe-226b-411d-8807-66bf1f477492
+11:54:12 - INFO:ftrack_inout.browser.browser_widget:Versions already loaded in UI for asset 4f23ecbe-226b-411d-8807-66bf1f477492
+11:54:12 - INFO:ftrack_inout.browser.browser_widget:Asset version selection: type=Asset, id=4f23ecbe-226b-411d-8807-66bf1f477492, selected=True
+11:54:12 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=True, hda_params=True
+11:54:12 - INFO:ftrack_inout.browser.browser_widget:Asset selected: ID 4f23ecbe-226b-411d-8807-66bf1f477492
+11:54:12 - INFO:ftrack_inout.browser.browser_widget:Versions already loaded in UI for asset 4f23ecbe-226b-411d-8807-66bf1f477492
+11:54:12 - INFO:ftrack_inout.browser.browser_widget:Asset version selection: type=Asset, id=4f23ecbe-226b-411d-8807-66bf1f477492, selected=True
+11:54:12 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=True, hda_params=True
+11:54:15 - INFO:ftrack_inout.browser.browser_widget:Asset version selection: type=None, id=None, selected=False
+11:54:15 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=False, hda_params=False
+11:54:15 - INFO:ftrack_inout.browser.browser_widget:Asset version selection: type=None, id=None, selected=False
+11:54:15 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=False, hda_params=False
+11:54:20 - INFO:ftrack_inout.browser.browser_widget:Asset item expanded: ID 09b29ecc-7a9d-49d5-a9eb-7bda99afaa74. Triggering version loading.
+11:54:20 - INFO:ftrack_inout.browser.browser_widget:[REFRESH] Loading versions for asset 09b29ecc-7a9d-49d5-a9eb-7bda99afaa74...
+11:54:20 - INFO:ftrack_inout.browser.browser_widget_optimized:[LAUNCH] OPTIMIZED: Fetching versions for asset 09b29ecc-7a9d-49d5-a9eb-7bda99afaa74 (force_refresh=False)
+11:54:20 - INFO:ftrack_inout.browser.browser_widget_optimized:[CLIP] Found 1 versions via relationship in 0.357s
+11:54:20 - INFO:ftrack_inout.browser.browser_widget_optimized:[BATCH GET] Loaded 1/1 versions in 0.000s (0.02ms per version)
+11:54:20 - INFO:ftrack_inout.browser.browser_widget_optimized:[OK] OPTIMIZED: 1 versions loaded in 0.828s
+11:54:20 - INFO:ftrack_inout.browser.browser_widget_optimized:   [STATS] Query: 0.357s, Batch get: 0.000s, Populate: 0.0ms, Conversion: 470.8ms
+11:54:20 - INFO:ftrack_inout.browser.browser_widget_optimized:   [TIMING] Step 1: 357.0ms, Step 2: 470.8ms, Total: 827.8ms
+11:54:20 - INFO:ftrack_inout.browser.browser_widget_optimized:   [LAUNCH] Speed: 1.2 versions/sec
+11:54:20 - INFO:ftrack_inout.browser.browser_widget:[OK] Loaded 1 versions for asset 09b29ecc-7a9d-49d5-a9eb-7bda99afaa74
+11:54:20 - INFO:ftrack_inout.browser.browser_widget:Asset item expanded: ID 09b29ecc-7a9d-49d5-a9eb-7bda99afaa74. Triggering version loading.
+11:54:20 - INFO:ftrack_inout.browser.browser_widget:Versions already loaded in UI for asset 09b29ecc-7a9d-49d5-a9eb-7bda99afaa74
+11:54:21 - INFO:ftrack_inout.browser.browser_widget:AssetVersion selected: ID b929e945-671e-4d16-9495-247496dbd2dd. Loading components...
+11:54:21 - INFO:ftrack_inout.browser.browser_widget:[COMPONENTS] Loading components for version b929e945... (force_refresh=False) at 11:54:21.849
+11:54:21 - INFO:ftrack_inout.browser.browser_widget_optimized:[CACHE MISS] Version b929e945-671e-4d16-9495-247496dbd2dd not in cache (cache size: 0, keys: empty...)
+11:54:21 - INFO:ftrack_inout.browser.browser_widget_optimized:[LAUNCH] OPTIMIZED: Fetching components with paths for version b929e945-671e-4d16-9495-247496dbd2dd (force_refresh=False)
+11:54:23 - INFO:ftrack_inout.browser.browser_widget_optimized:[CLIP] Found 5 component IDs in 1.241s
+11:54:24 - INFO:ftrack_inout.browser.browser_widget_optimized:[OK] OPTIMIZED: 5 components with paths loaded in 2.756s
+11:54:24 - INFO:ftrack_inout.browser.browser_widget_optimized:   [STATS] Query: 1.241s, Batch get: 1.515s
+11:54:24 - INFO:ftrack_inout.browser.browser_widget_optimized:   [LAUNCH] Speed: 1.8 components/sec
+11:54:24 - INFO:ftrack_inout.browser.browser_widget_optimized:[CACHE SAVE] Saved 5 components for version b929e945-671e-4d16-9495-247496dbd2dd to cache (cache size now: 1)
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:[COMPONENTS] Components loaded for version b929e945... at 11:54:24.606
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:[COMPONENTS] Total time: 2.757s (2756.7ms) for 5 components
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:Asset version selection: type=AssetVersion, id=b929e945-671e-4d16-9495-247496dbd2dd, selected=True
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=True, hda_params=True
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:Automatically set 'From' location to 'x:/proj/'
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:Asset version selection: type=AssetVersion, id=b929e945-671e-4d16-9495-247496dbd2dd, selected=True
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=True, hda_params=True
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:Asset version selection: type=AssetVersion, id=b929e945-671e-4d16-9495-247496dbd2dd, selected=True
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=True, hda_params=True
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:AssetVersion selected: ID b929e945-671e-4d16-9495-247496dbd2dd. Loading components...
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:[COMPONENTS] Loading components for version b929e945... (force_refresh=False) at 11:54:24.611
+11:54:24 - INFO:ftrack_inout.browser.browser_widget_optimized:[CACHE HIT] Using cached components for version b929e945-671e-4d16-9495-247496dbd2dd (5 components, cache size: 1)
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:[COMPONENTS] Components loaded for version b929e945... at 11:54:24.612
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:[COMPONENTS] Total time: 0.000s (0.1ms) for 5 components
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:Automatically set 'From' location to 'x:/proj/'
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:Asset version selection: type=AssetVersion, id=b929e945-671e-4d16-9495-247496dbd2dd, selected=True
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=True, hda_params=True
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:Asset version selection: type=AssetVersion, id=b929e945-671e-4d16-9495-247496dbd2dd, selected=True
+11:54:24 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=True, hda_params=True
+11:54:25 - INFO:ftrack_inout.browser.browser_widget:Component selected: ID e18bf52d-8f76-4718-94bd-ed70581d5cd3, Path: snapshot
+11:54:25 - INFO:ftrack_inout.browser.browser_widget:Asset version selection: type=AssetVersion, id=b929e945-671e-4d16-9495-247496dbd2dd, selected=True
+11:54:25 - INFO:ftrack_inout.browser.browser_widget:Component selection: data={'id': 'e18bf52d-8f76-4718-94bd-ed70581d5cd3', 'locations': ['x:/proj/'], 'name': 'snapshot', 'path': 'snapshot', 'type': '.hip'}, selected=True
+11:54:25 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=True, hda_params=True
+11:54:25 - INFO:ftrack_inout.browser.browser_widget:Component selected: ID e18bf52d-8f76-4718-94bd-ed70581d5cd3, Path: snapshot
+11:54:25 - INFO:ftrack_inout.browser.browser_widget:Asset version selection: type=AssetVersion, id=b929e945-671e-4d16-9495-247496dbd2dd, selected=True
+11:54:25 - INFO:ftrack_inout.browser.browser_widget:Component selection: data={'id': 'e18bf52d-8f76-4718-94bd-ed70581d5cd3', 'locations': ['x:/proj/'], 'name': 'snapshot', 'path': 'snapshot', 'type': '.hip'}, selected=True
+11:54:25 - INFO:ftrack_inout.browser.browser_widget:Button states updated: copy_selected_id=True, hda_params=True

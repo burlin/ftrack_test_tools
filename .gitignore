@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+
+# Backup
+*.bac
+*.bak
+
+# Large binaries (exceed GitHub 100MB limit; install separately)
+tools/ffmpeg/bin/
