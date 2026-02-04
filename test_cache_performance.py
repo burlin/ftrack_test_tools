@@ -405,8 +405,9 @@ def main():
     
     asset_id = sys.argv[1]
     
-    # Bootstrap environment (same as run_browser.py)
-    project_root = Path(__file__).resolve().parent
+    # Bootstrap environment (when run from tools/, use parent as project root)
+    _script_dir = Path(__file__).resolve().parent
+    project_root = _script_dir.parent if _script_dir.name == "tools" else _script_dir
     _bootstrap_environment(project_root)
     
     # Check credentials

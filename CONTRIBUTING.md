@@ -35,9 +35,6 @@ def process_transfer_request(event):
     This function handles incoming transfer requests and validates
     that they are intended for the current user and workstation.
     
-    Args:
-        event: Ftrack event object containing transfer request data
-        
     Returns:
         bool: True if request was processed successfully
     """

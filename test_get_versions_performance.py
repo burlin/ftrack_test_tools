@@ -453,8 +453,9 @@ def main():
     if len(sys.argv) >= 3:
         force_refresh = sys.argv[2].lower() in ('true', '1', 'yes')
     
-    # Bootstrap environment
-    project_root = Path(__file__).resolve().parent
+    # Bootstrap environment (when run from tools/, use parent as project root)
+    _script_dir = Path(__file__).resolve().parent
+    project_root = _script_dir.parent if _script_dir.name == "tools" else _script_dir
     _bootstrap_environment(project_root)
     
     # Check credentials

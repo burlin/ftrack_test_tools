@@ -20,7 +20,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Bootstrap environment (same as run_browser.py)
-project_root = Path(__file__).resolve().parent
+# When run from tools/, use parent as project root
+_script_dir = Path(__file__).resolve().parent
+project_root = _script_dir.parent if _script_dir.name == "tools" else _script_dir
 
 # Add ftrack_plugins to path
 plugins_root = project_root / "ftrack_plugins"

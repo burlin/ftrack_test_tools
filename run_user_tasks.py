@@ -15,7 +15,8 @@ from run_browser import _bootstrap_environment  # type: ignore
 
 
 def main() -> None:
-    project_root = Path(__file__).resolve().parent
+    _script_dir = Path(__file__).resolve().parent
+    project_root = _script_dir.parent if _script_dir.name == "tools" else _script_dir
     _bootstrap_environment(project_root)
 
     try:
@@ -30,9 +31,6 @@ def main() -> None:
         print(f"[run_user_tasks] Failed to import ftrack_inout.browser: {exc}")
         sys.exit(1)
 
-    # Configure basic logging after browser may have called
-    # its own logging.basicConfig. We need at least INFO to see
-    # UserTasksWidget timings in console.
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s:%(name)s:%(message)s",
@@ -60,5 +58,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-

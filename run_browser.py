@@ -188,8 +188,8 @@ def _bootstrap_environment(project_root: Path) -> None:
 
 def main() -> None:
     """Launch standalone browser."""
-
-    project_root = Path(__file__).resolve().parent
+    _script_dir = Path(__file__).resolve().parent
+    project_root = _script_dir.parent if _script_dir.name == "tools" else _script_dir
     _bootstrap_environment(project_root)
     # Debug output of env after bootstrap to see which AWS credentials are active.
     _debug_print_aws_env()
@@ -237,5 +237,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-

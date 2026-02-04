@@ -41,9 +41,10 @@ if sys.version_info >= (3, 12) and 'imp' not in sys.modules:
     sys.modules['imp'] = imp_stub  # type: ignore
     print("[test_publisher] Added imp module stub for Python 3.12+ compatibility")
 
-# Add ftrack_plugins to path
-current_dir = Path(__file__).resolve().parent
-sys.path.insert(0, str(current_dir / 'ftrack_plugins'))
+# Project root: when run from tools/, use parent
+_script_dir = Path(__file__).resolve().parent
+_project_root = _script_dir.parent if _script_dir.name == "tools" else _script_dir
+sys.path.insert(0, str(_project_root / "ftrack_plugins"))
 
 # Bootstrap environment (similar to run_browser.py)
 def _bootstrap_environment(project_root: Path) -> None:
@@ -115,9 +116,8 @@ from ftrack_inout.publisher.ui.publisher_widget import PublisherWidget
 
 def main():
     """Run the test application."""
-    # Bootstrap environment
-    project_root = Path(__file__).resolve().parent
-    _bootstrap_environment(project_root)
+    # Bootstrap environment (project_root set at module level)
+    _bootstrap_environment(_project_root)
     
     # Check Ftrack session availability and create session if possible
     ftrack_session = None
