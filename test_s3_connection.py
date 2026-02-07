@@ -5,11 +5,27 @@ import traceback
 
 from pathlib import Path
 
+
+def _add_dependencies_to_path() -> None:
+    """Add ftrack_inout and multi-site-location dependencies to sys.path for boto3."""
+    root = Path(__file__).resolve().parents[1]
+    for subpath in (
+        "ftrack_plugins/ftrack_inout/dependencies",
+        "ftrack_plugins/multi-site-location-0.2.0/dependencies",
+    ):
+        deps = root / subpath
+        if deps.is_dir() and str(deps) not in sys.path:
+            sys.path.insert(0, str(deps))
+
+
+_add_dependencies_to_path()
+
 try:
     import boto3  # type: ignore
     from botocore.exceptions import ClientError, EndpointConnectionError  # type: ignore
 except ImportError as exc:  # pragma: no cover - diagnostic script
     print(f"[FATAL] Cannot import boto3: {exc}")
+    print("Install: pip install -r ftrack_plugins/multi-site-location-0.2.0/requirements.txt -t ftrack_plugins/multi-site-location-0.2.0/dependencies")
     sys.exit(1)
 
 
