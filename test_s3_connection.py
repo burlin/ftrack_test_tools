@@ -89,12 +89,20 @@ def main() -> int:
     print(f"AWS_SECRET_ACCESS_KEY / S3_SECRET_KEY / MINIO_SECRET_KEY set: {bool(secret_key)}")
     print(f"S3_BUCKET / MINIO_BUCKET = {bucket_name!r}")
 
+    location_name = env("S3_LOCATION_NAME")
+    print(f"S3_LOCATION_NAME = {location_name!r}")
+
     if not endpoint_url:
         print("[ERROR] S3_MINIO_ENDPOINT_URL is not set")
     if not access_key or not secret_key:
         print("[ERROR] Access or secret key is not set")
     if not bucket_name:
         print("[ERROR] Bucket name is not set")
+    if not location_name:
+        print(
+            "[ERROR] S3_LOCATION_NAME is not set. "
+            "ftrack Connect needs it in this .env to register the S3 location; without it, transfers from/to S3 will fail."
+        )
 
     # Even if something is missing, we still try to continue – это поможет увидеть точную ошибку.
 
