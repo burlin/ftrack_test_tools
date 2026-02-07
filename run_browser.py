@@ -47,6 +47,41 @@ if sys.version_info >= (3, 12) and 'imp' not in sys.modules:
     sys.modules['imp'] = imp_stub  # type: ignore
     print("[run_browser] Added imp module stub for Python 3.12+ compatibility")
 
+# Compatibility: distutils was removed in Python 3.12+, ftrack_api.session uses distutils.version.LooseVersion
+if sys.version_info >= (3, 12) and 'distutils' not in sys.modules:
+    import re
+    import types
+
+    class LooseVersion:
+        """Minimal LooseVersion for version string comparison (e.g. '3.3.11')."""
+        def __init__(self, v: str):
+            self.v = str(v)
+            parts = re.findall(r'\d+|[a-zA-Z]+', self.v)
+            self.version = [int(x) if x.isdigit() else x for x in parts]
+
+        def __gt__(self, other: object) -> bool:
+            if not isinstance(other, LooseVersion):
+                other = LooseVersion(str(other))
+            return self.version > other.version
+
+        def __lt__(self, other: object) -> bool:
+            if not isinstance(other, LooseVersion):
+                other = LooseVersion(str(other))
+            return self.version < other.version
+
+        def __eq__(self, other: object) -> bool:
+            if not isinstance(other, LooseVersion):
+                other = LooseVersion(str(other))
+            return self.version == other.version
+
+    distutils_version = types.ModuleType('distutils.version')
+    distutils_version.LooseVersion = LooseVersion  # type: ignore
+    distutils = types.ModuleType('distutils')
+    distutils.version = distutils_version  # type: ignore
+    sys.modules['distutils'] = distutils  # type: ignore
+    sys.modules['distutils.version'] = distutils_version  # type: ignore
+    print("[run_browser] Added distutils.version stub for Python 3.12+ compatibility")
+
 
 def _debug_print_aws_env() -> None:
     """Debug output of AWS environment variables.
