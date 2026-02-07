@@ -11,6 +11,11 @@ import sys
 from pathlib import Path
 import logging
 
+# Ensure tools is in path for run_browser import
+_tools_dir = Path(__file__).resolve().parent
+if str(_tools_dir) not in sys.path:
+    sys.path.insert(0, str(_tools_dir))
+
 from run_browser import _bootstrap_environment  # type: ignore
 
 

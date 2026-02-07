@@ -124,15 +124,8 @@ def _bootstrap_environment(project_root: Path) -> None:
     - adds ftrack_plugins to sys.path and FTRACK_CONNECT_PLUGIN_PATH.
     """
 
-    # 1) Load possible .env files (optional).
-    _load_dotenv_if_available(project_root / ".env")
+    # 1) Load credentials from config/.env (FTRACK_*, S3, etc.)
     _load_dotenv_if_available(project_root / "config" / ".env")
-    _load_dotenv_if_available(
-        project_root
-        / "ftrack_plugins"
-        / "multi-site-location-0.2.0"
-        / ".env"
-    )
 
     # 2) Pull values from config/mroya.json (if exists).
     config_path = project_root / "config" / "mroya.json"

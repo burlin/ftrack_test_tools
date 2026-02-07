@@ -28,13 +28,12 @@ def print_header(title: str) -> None:
 
 
 def _load_env_from_multisite_plugin() -> None:
-    """Load S3 credentials from multi-site-location .env without restarting Connect."""
+    """Load S3 credentials from multi-site-location .env (location setup)."""
     try:
-        # tools/test_s3_connection.py -> project root
         root = Path(__file__).resolve().parents[1]
         env_path = root / "ftrack_plugins" / "multi-site-location-0.2.0" / ".env"
         if not env_path.exists():
-            print(f"[INFO] .env file not found at {env_path}, skipping explicit load")
+            print(f"[INFO] multi-site-location .env not found, skipping")
             return
         print(f"[INFO] Loading S3 config from {env_path}")
         for line in env_path.read_text(encoding="utf-8").splitlines():
@@ -48,18 +47,17 @@ def _load_env_from_multisite_plugin() -> None:
             value = value.strip().strip('"').strip("'")
             if not key:
                 continue
-            # Do not overwrite variables that are already set in the environment.
             if os.getenv(key) is None:
                 os.environ[key] = value
     except Exception:
-        print("[WARN] Failed to load .env from multi-site-location-0.2.0")
+        print("[WARN] Failed to load multi-site-location .env")
         traceback.print_exc()
 
 
 def main() -> int:
     print_header("S3 / MinIO connection diagnostic")
 
-    # First, load values from the same .env that uses the S3 plugin.
+    # Load S3 credentials from multi-site-location .env
     _load_env_from_multisite_plugin()
 
     # Support both legacy and new naming: S3_MINIO_ENDPOINT_URL and S3_MINIO_API_ENDPOINT_URL.

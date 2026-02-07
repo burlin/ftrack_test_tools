@@ -71,10 +71,7 @@ def _load_dotenv_if_available(path: Path) -> None:
 
 def _bootstrap_environment(project_root: Path) -> None:
     """Initialize environment (same as run_browser.py)."""
-    # Load .env files
-    _load_dotenv_if_available(project_root / ".env")
     _load_dotenv_if_available(project_root / "config" / ".env")
-    _load_dotenv_if_available(project_root / "ftrack_plugins" / "multi-site-location-0.2.0" / ".env")
 
     # Load config/mroya.json
     config_path = project_root / "config" / "mroya.json"
@@ -416,8 +413,7 @@ def main():
     if missing:
         print(f"[ERROR] Missing required environment variables: {', '.join(missing)}")
         print("\nPlease set them in:")
-        print("  - .env file")
-        print("  - config/.env file")
+        print("  - config/.env")
         print("  - config/mroya.json")
         print("  - Environment variables")
         sys.exit(1)

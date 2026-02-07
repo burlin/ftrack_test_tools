@@ -68,7 +68,6 @@ def _load_dotenv_if_available(path: Path) -> None:
         except Exception:
             pass
 
-_load_dotenv_if_available(project_root / ".env")
 _load_dotenv_if_available(project_root / "config" / ".env")
 
 # Load config/mroya.json
@@ -269,7 +268,7 @@ print("SUMMARY")
 print("=" * 80)
 print("[OK] All tests completed")
 print("\nNext steps:")
-print("1. Run 'python run_browser.py' to test browser UI")
+print("1. Run 'python tools/run_browser.py' to test browser UI")
 print("2. Check logs for '[OK] Using shared session from common factory' messages")
 print("3. Verify cache performance in browser operations")
 print("=" * 80)

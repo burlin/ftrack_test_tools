@@ -65,9 +65,7 @@ def _load_dotenv(path: Path) -> None:
 
 
 def _bootstrap(project_root: Path) -> None:
-    _load_dotenv(project_root / ".env")
     _load_dotenv(project_root / "config" / ".env")
-    _load_dotenv(project_root / "ftrack_plugins" / "multi-site-location-0.2.0" / ".env")
     config_path = project_root / "config" / "mroya.json"
     if config_path.is_file():
         try:

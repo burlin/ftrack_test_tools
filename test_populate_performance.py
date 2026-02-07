@@ -65,10 +65,7 @@ def _load_dotenv_if_available(path: Path) -> None:
 
 def _bootstrap_environment(project_root: Path) -> None:
     """Initialize environment."""
-    # Load .env files
-    _load_dotenv_if_available(project_root / ".env")
     _load_dotenv_if_available(project_root / "config" / ".env")
-    _load_dotenv_if_available(project_root / "ftrack_plugins" / "multi-site-location-0.2.0" / ".env")
 
     # Load config/mroya.json
     config_path = project_root / "config" / "mroya.json"

@@ -3,7 +3,7 @@
 Send a single test mroya.transfer.request event.
 
 Использует тот же bootstrap окружения, что run_browser / run_user_tasks:
-- загружает G:\\mroya\\.env и config/mroya.json;
+- загружает config/.env и config/mroya.json;
 - создаёт ftrack_api.Session;
 - создаёт Job c данными tag="mroya_transfer";
 - публикует событие topic="mroya.transfer.request".
@@ -19,8 +19,11 @@ from pathlib import Path
 import ftrack_api  # type: ignore
 from ftrack_api.event.base import Event  # type: ignore
 
-# Поднимаем project root в sys.path, чтобы можно было импортировать run_browser
+# Add tools to path so run_browser can be imported
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+TOOLS_DIR = PROJECT_ROOT / "tools"
+if str(TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR))
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 

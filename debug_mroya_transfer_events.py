@@ -3,7 +3,7 @@
 Debug helper for Mroya transfer pipeline.
 
 Запускается **вне** ftrack Connect / DCC и:
-- поднимает то же окружение, что `run_browser.py` (загружает `.env` и config);
+- поднимает то же окружение, что `run_browser.py` (config/.env и config/mroya.json);
 - подключается к ftrack_api.Session;
 - подписывается на topic="mroya.transfer.request";
 - печатает любые входящие события в консоль.
@@ -18,9 +18,11 @@ from pathlib import Path
 
 import ftrack_api  # type: ignore
 
-# Поднимаем project root в sys.path, чтобы можно было импортировать run_browser,
-# даже если скрипт запускается как tools/debug_mroya_transfer_events.py
+# Add tools to path so run_browser can be imported
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+TOOLS_DIR = PROJECT_ROOT / "tools"
+if str(TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR))
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 

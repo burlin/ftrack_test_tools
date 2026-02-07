@@ -9,9 +9,9 @@ from pathlib import Path
 
 # Bootstrap environment
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+TOOLS_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(TOOLS_DIR))
 sys.path.insert(0, str(PROJECT_ROOT))
-
-# Добавляем путь к custom_transfer
 sys.path.insert(0, str(PROJECT_ROOT / "ftrack_plugins" / "mroya_transfer_manager-0.1.0" / "hook" / "lib"))
 
 from run_browser import _bootstrap_environment

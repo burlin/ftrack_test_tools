@@ -6,6 +6,11 @@ import sys
 import os
 from pathlib import Path
 
+# Ensure tools is in path for run_browser import
+_tools_dir = Path(__file__).resolve().parent
+if str(_tools_dir) not in sys.path:
+    sys.path.insert(0, str(_tools_dir))
+
 # Redirect stderr to stdout for better pipe handling
 # But keep stdout for Qt messages
 if not sys.stdout.isatty():

@@ -49,12 +49,8 @@ sys.path.insert(0, str(_project_root / "ftrack_plugins"))
 # Bootstrap environment (similar to run_browser.py)
 def _bootstrap_environment(project_root: Path) -> None:
     """Initialize environment for standalone publisher launch."""
-    # Load .env files if available
-    for env_path in [
-        project_root / ".env",
-        project_root / "config" / ".env",
-        project_root / "ftrack_plugins" / "multi-site-location-0.2.0" / ".env",
-    ]:
+    # Load credentials from config/.env
+    for env_path in [project_root / "config" / ".env"]:
         if env_path.is_file():
             try:
                 from dotenv import load_dotenv

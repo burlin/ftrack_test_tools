@@ -110,11 +110,7 @@ def _load_dotenv_if_available(path: Path) -> None:
 def _bootstrap_environment(project_root: Path) -> None:
     """Initialize environment for standalone FtrackInputWidget launch."""
 
-    _load_dotenv_if_available(project_root / ".env")
     _load_dotenv_if_available(project_root / "config" / ".env")
-    _load_dotenv_if_available(
-        project_root / "ftrack_plugins" / "multi-site-location-0.2.0" / ".env"
-    )
 
     config_path = project_root / "config" / "mroya.json"
     if config_path.is_file():
