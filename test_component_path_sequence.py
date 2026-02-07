@@ -1,8 +1,12 @@
 """
-Diagnostic script: component path resolution for sequences vs single files.
+Diagnostic script: component path resolution — finput vs browser flows.
 
-Tests all path-resolution hypotheses with pre-loaded locations and credentials
-(as in run_browser.py). Also tests browser's get_components_with_paths flow.
+Calls the SAME code paths as:
+- finput: ftrack_utils.get_component_path() (from ftrack_houdini)
+- browser: FtrackApiClient.get_component_location_info() (from simple_api_client)
+
+Bootstrap matches run_browser (plugins, locations, credentials).
+Prints all intermediate data needed for conclusions.
 
 Usage:
   python test_component_path_sequence.py [component_id]
@@ -84,19 +88,23 @@ import ftrack_api
 DEFAULT_COMPONENT_ID = "dbf2f337-7e71-42ad-a4e3-867ca602c658"
 
 
-def _accessor_type(loc) -> str:
-    if not loc.accessor:
+def _accessor_info(loc) -> str:
+    """Describe location accessor for prints."""
+    acc = getattr(loc, "accessor", None)
+    if acc is None:
         return "None"
-    t = type(loc.accessor)
-    name = t.__name__
-    if "s3" in str(t).lower():
-        return f"{name} (S3)"
-    try:
-        if hasattr(ftrack_api.accessor, "disk") and isinstance(loc.accessor, ftrack_api.accessor.disk.DiskAccessor):
-            return f"{name} (Disk)"
-    except Exception:
-        pass
-    return name
+    t = type(acc).__name__
+    if "Symbol" in t or "symbol" in str(type(acc)).lower():
+        return f"Symbol/placeholder (no real accessor)"
+    if hasattr(ftrack_api, "accessor") and hasattr(ftrack_api.accessor, "disk"):
+        try:
+            if isinstance(acc, ftrack_api.accessor.disk.DiskAccessor):
+                return f"DiskAccessor (Disk)"
+        except Exception:
+            pass
+    if "s3" in str(type(acc)).lower():
+        return f"{t} (S3)"
+    return t
 
 
 def _section(title: str) -> None:
@@ -106,35 +114,33 @@ def _section(title: str) -> None:
     print("=" * 80)
 
 
-def _result(ok: bool, msg: str, detail: str = "") -> None:
-    prefix = "[OK]" if ok else "[FAIL]"
-    print(f"  {prefix} {msg}")
-    if detail:
-        for line in detail.strip().split("\n"):
-            print(f"       {line}")
-
-
 def main() -> int:
     component_id = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_COMPONENT_ID
 
     print()
     print("=" * 80)
-    print("  COMPONENT PATH RESOLUTION DIAGNOSTIC (sequences vs single files)")
+    print("  COMPONENT PATH DIAGNOSTIC — finput vs browser (real code paths)")
     print("=" * 80)
     print(f"  Component ID: {component_id}")
     print(f"  Project root: {_project_root}")
     print()
 
-    # Session with event hub so location plugins register
+    # Session — same as browser: create then add locations (FtrackApiClient does this)
     try:
         session = ftrack_api.Session(auto_connect_event_hub=True)
+        # Load locations like run_browser / FtrackApiClient (multi-site S3 + user disk)
+        try:
+            from ftrack_inout.browser.simple_api_client import _add_locations_if_available
+            _add_locations_if_available(session)
+            print("[run_browser] Locations registered via _add_locations_if_available")
+        except Exception as loc_err:
+            print(f"[WARN] _add_locations_if_available: {loc_err}")
     except Exception as e:
         print(f"[FATAL] Failed to create session: {e}")
         import traceback
         traceback.print_exc()
         return 1
 
-    # Load component
     try:
         component = session.get("Component", component_id)
     except Exception as e:
@@ -144,11 +150,41 @@ def main() -> int:
         print("[FATAL] Component not found.")
         return 1
 
-    comp_name = component.get("name", "?")
-    comp_file_type = component.get("file_type", "?")
+    # ─── Environment / versions ───
+    _section("ENV — Python, fileseq, locations")
+    print(f"  Python: {sys.version}")
+    try:
+        import fileseq
+        ver = getattr(fileseq, "__version__", "?")
+        print(f"  fileseq: {ver}")
+    except ImportError:
+        print(f"  fileseq: not available")
+    print()
+    print("  --- Locations with real accessor (on this host) ---")
+    for loc in session.query("Location").all():
+        acc = getattr(loc, "accessor", None)
+        if acc is None or "Symbol" in type(acc).__name__ or "symbol" in str(type(acc)).lower():
+            continue
+        if not hasattr(acc, "get_filesystem_path"):
+            continue
+        print(f"    {loc['name']!r}: {_accessor_info(loc)}")
+    try:
+        session.populate([component], "component_locations")
+        comp_locs = component.get("component_locations") or []
+        print()
+        print("  --- component_locations (where this component exists) ---")
+        for cl in comp_locs:
+            loc_ent = cl.get("location")
+            loc_name = loc_ent.get("name", "?") if loc_ent else "?"
+            rid = cl.get("resource_identifier", "?")
+            print(f"    {loc_name!r}: {rid[:70]}{'...' if len(str(rid)) > 70 else ''}")
+    except Exception as e:
+        print(f"  component_locations: {e}")
+    print()
+
     print("--- Component ---")
-    print(f"  name: {comp_name}")
-    print(f"  file_type: {comp_file_type}")
+    print(f"  name: {component.get('name', '?')}")
+    print(f"  file_type: {component.get('file_type', '?')}")
     print(f"  id: {component['id']}")
     if component.get("version"):
         v = component["version"]
@@ -157,215 +193,124 @@ def main() -> int:
             print(f"  asset: {v['asset'].get('name')} (id: {v['asset']['id']})")
     print()
 
-    # --- Hypothesis A: finput-style (pick_location + get_filesystem_path, no populate) ---
-    _section("A) Finput-style: pick_location + get_filesystem_path (no populate)")
+    # ─── FINPUT FLOW: ftrack_utils.get_component_path (code copied from finput) ───
+    _section("FINPUT FLOW — ftrack_utils.get_component_path (code from finput)")
 
-    try:
-        loc = session.pick_location()
-        if not loc:
-            _result(False, "pick_location() returned None")
-        else:
-            print(f"  Picked location: {loc['name']!r} (id: {loc['id']})")
-            print(f"  Accessor: {_accessor_type(loc)}")
-            avail = loc.get_component_availability(component)
-            print(f"  Availability: {avail}%")
-            try:
-                path = loc.get_filesystem_path(component)
-                if path is None:
-                    _result(False, "get_filesystem_path => None")
-                elif not str(path).strip():
-                    _result(False, "get_filesystem_path => (empty string)")
-                else:
-                    _result(True, f"path = {path[:100]}{'...' if len(str(path)) > 100 else ''}")
-                # resource_identifier
-                try:
-                    rid = loc.get_resource_identifier(component)
-                    print(f"  resource_identifier: {rid!r}")
-                except Exception as e2:
-                    print(f"  resource_identifier: exception {e2}")
-            except Exception as e:
-                _result(False, f"get_filesystem_path => exception: {e}")
-                import traceback
-                traceback.print_exc()
-    except Exception as e:
-        _result(False, f"Finput-style flow failed: {e}")
-        import traceback
-        traceback.print_exc()
+    # Inject session so ftrack_utils uses our bootstrapped session
+    import importlib
+    ftrack_utils_mod = None
+    for mod_path in [
+        "ftrack_inout.ftrack_hou_utils.ftrack_utils",
+    ]:
+        try:
+            ftrack_utils_mod = importlib.import_module(mod_path)
+            print(f"  Module: {mod_path}")
+            break
+        except (ImportError, AttributeError) as e:
+            print(f"  Skip {mod_path}: {e}")
+            continue
 
-    # --- Hypothesis B: With populate(component_locations) first ---
-    _section("B) With session.populate(component, 'component_locations') first")
+    if not ftrack_utils_mod or not hasattr(ftrack_utils_mod, "get_component_path"):
+        print("  [FAIL] ftrack_utils.get_component_path not available")
+    else:
+        if hasattr(ftrack_utils_mod, "_ftrack_session"):
+            ftrack_utils_mod._ftrack_session = session  # type: ignore
 
-    try:
-        session.populate([component], "component_locations")
-        print("  populate(component, 'component_locations') done.")
-        comp_locs = component.get("component_locations") or []
-        print(f"  component_locations count: {len(comp_locs)}")
-        for cl in comp_locs[:5]:
-            loc_ent = cl.get("location")
-            loc_name = loc_ent.get("name", "?") if loc_ent else "?"
-            rid = cl.get("resource_identifier", "?")
-            print(f"    - location={loc_name!r}, resource_identifier={rid[:80]!r}{'...' if len(str(rid)) > 80 else ''}")
-        if len(comp_locs) > 5:
-            print(f"    ... and {len(comp_locs) - 5} more")
-
-        loc = session.pick_location()
-        if loc:
-            try:
-                path = loc.get_filesystem_path(component)
-                if path is None or not str(path).strip():
-                    _result(False, f"get_filesystem_path after populate => {path!r}")
-                else:
-                    _result(True, f"path = {path[:100]}{'...' if len(str(path)) > 100 else ''}")
-            except Exception as e:
-                _result(False, f"get_filesystem_path after populate => exception: {e}")
-    except Exception as e:
-        _result(False, f"Populate flow failed: {e}")
-        import traceback
-        traceback.print_exc()
-
-    # --- Hypothesis C: Browser-style (get_components_with_paths logic) ---
-    _section("C) Browser-style: get_components_with_paths flow")
-
-    try:
-        version_id = component.get("version", {}).get("id")
-        if not version_id:
-            _result(False, "No version_id on component")
-        else:
-            # Replicate browser: query components, populate component_locations, pick_location, get_filesystem_path
-            comps = session.query(
-                'select id, name, file_type, component_locations.location.name, '
-                'component_locations.location.label from Component where '
-                f'version.id is "{version_id}"'
-            ).all()
-            comp_ids = [c["id"] for c in comps]
-            comp_entities = [session.get("Component", cid) for cid in comp_ids]
-            session.populate(comp_entities, "component_locations")
-
-            location = session.pick_location()
-            if not location:
-                _result(False, "pick_location() returned None")
-            else:
-                our_comp = next((c for c in comp_entities if c["id"] == component_id), None)
-                if not our_comp:
-                    _result(False, "Component not found in query result")
-                else:
-                    try:
-                        path = location.get_filesystem_path(our_comp)
-                        if path is None or not str(path).strip():
-                            _result(False, f"path => {path!r}")
-                        else:
-                            _result(True, f"path = {path[:100]}{'...' if len(str(path)) > 100 else ''}")
-                        try:
-                            rid = location.get_resource_identifier(our_comp)
-                            print(f"  resource_identifier: {rid!r}")
-                        except Exception:
-                            pass
-                    except Exception as e:
-                        _result(False, f"exception: {e}")
-                        import traceback
-                        traceback.print_exc()
-    except Exception as e:
-        _result(False, f"Browser-style flow failed: {e}")
-        import traceback
-        traceback.print_exc()
-
-    # --- Hypothesis D: All locations with availability > 0 ---
-    _section("D) All locations where component has availability > 0")
-
-    try:
-        locations = session.query("Location").all()
-        found_any = False
-        for loc in locations:
-            try:
+        # Manual trace — same logic as get_component_path, with prints
+        print()
+        print("  --- Step 1: pick_location (as in finput) ---")
+        try:
+            loc = session.pick_location()
+            if loc:
+                print(f"    picked_location: name={loc['name']!r} id={loc['id']}")
+                print(f"    accessor: {_accessor_info(loc)}")
                 avail = loc.get_component_availability(component)
-                if avail <= 0:
-                    continue
-                found_any = True
-                acc = _accessor_type(loc)
-                path_result = "(not tried)"
-                rid_result = "(not tried)"
+                print(f"    availability: {avail}%")
+                if avail >= 100.0:
+                    try:
+                        p = loc.get_filesystem_path(component)
+                        if p and str(p).strip():
+                            print(f"    get_filesystem_path: {str(p)[:120]}{'...' if len(str(p)) > 120 else ''}")
+                        else:
+                            print(f"    get_filesystem_path: {p!r}")
+                    except Exception as ex:
+                        print(f"    get_filesystem_path: EXCEPTION {ex}")
+                else:
+                    print(f"    (availability < 100%, skip get_filesystem_path)")
+            else:
+                print("    picked_location: None")
+        except Exception as e:
+            print(f"    pick_location: EXCEPTION {e}")
+
+        print()
+        print("  --- Step 2: fallback — locations with 100% availability ---")
+        try:
+            all_locs = session.query("Location").all()
+            disk, other = [], []
+            for loc in all_locs:
                 try:
-                    rid = loc.get_resource_identifier(component)
-                    rid_result = rid[:80] + "..." if rid and len(str(rid)) > 80 else (rid or "(empty)")
-                except Exception as ex:
-                    rid_result = f"exception: {ex!r}"
+                    a = loc.get_component_availability(component)
+                    if a < 100.0:
+                        continue
+                    acc = getattr(loc, "accessor", None)
+                    if acc and hasattr(acc, "get_filesystem_path"):
+                        if hasattr(ftrack_api.accessor, "disk") and isinstance(acc, ftrack_api.accessor.disk.DiskAccessor):
+                            disk.append(loc)
+                        else:
+                            other.append(loc)
+                except Exception:
+                    pass
+            for loc in disk + other:
+                name = loc.get("name", "?")
+                acc_info = _accessor_info(loc)
+                path_out = "(not tried)"
                 try:
                     p = loc.get_filesystem_path(component)
-                    if p is None:
-                        path_result = "None"
-                    elif not str(p).strip():
-                        path_result = "(empty)"
-                    else:
-                        path_result = (p[:80] + "...") if len(str(p)) > 80 else p
+                    path_out = (str(p)[:80] + "...") if p and len(str(p)) > 80 else (str(p) if p else "None")
                 except Exception as ex:
-                    path_result = f"exception: {ex!r}"
-                print(f"  {loc['name']!r}: avail={avail}% | accessor={acc}")
-                print(f"    resource_identifier: {rid_result}")
-                print(f"    path: {path_result}")
-                acc = getattr(loc, "accessor", None)
-                if acc is None or not hasattr(acc, "get_filesystem_path"):
-                    print(f"    [WARN] accessor missing or has no get_filesystem_path")
-            except Exception:
-                pass
-        if not found_any:
-            print("  No locations with availability > 0")
-    except Exception as e:
-        _result(False, f"All-locations scan failed: {e}")
-        import traceback
-        traceback.print_exc()
+                    path_out = f"EXCEPTION: {ex}"
+                print(f"    {name!r}: accessor={acc_info} -> path={path_out}")
+        except Exception as e:
+            print(f"    EXCEPTION: {e}")
 
-    # --- E) Direct ftrack_utils.get_component_path (finput's actual function) ---
-    _section("E) ftrack_utils.get_component_path (finput's function)")
+        print()
+        print("  --- Step 3: actual get_component_path(component) ---")
+        try:
+            path = ftrack_utils_mod.get_component_path(component)
+            if path and str(path).strip():
+                print(f"    RESULT: {path[:120]}{'...' if len(str(path)) > 120 else ''}")
+            else:
+                print(f"    RESULT: {path!r}")
+        except Exception as e:
+            print(f"    EXCEPTION: {e}")
+            import traceback
+            traceback.print_exc()
+
+    # ─── BROWSER FLOW: FtrackApiClient.get_component_location_info ───
+    _section("BROWSER FLOW — FtrackApiClient.get_component_location_info (code from browser)")
 
     try:
-        ftrack_utils_mod = None
-        last_err = None
-        for mod_path in [
-            "ftrack_inout.ftrack_hou_utils.ftrack_utils",
-            "ftrack_houdini.ftrack_hou_utils.ftrack_utils",
-        ]:
-            try:
-                parts = mod_path.split(".")
-                mod = __import__(parts[0])
-                for p in parts[1:]:
-                    mod = getattr(mod, p)
-                ftrack_utils_mod = mod
-                print(f"  Using: {mod_path}")
-                break
-            except (ImportError, AttributeError) as e:
-                last_err = e
-                continue
-
-        if not ftrack_utils_mod or not hasattr(ftrack_utils_mod, "get_component_path"):
-            if last_err:
-                print(f"  Last import error: {last_err}")
-            _result(False, f"ftrack_utils module not found or has no get_component_path")
+        from ftrack_inout.browser.simple_api_client import FtrackApiClient
+        client = FtrackApiClient(_enable_bulk_preload=False)
+        sess = client.get_session()
+        if not sess:
+            print("  [FAIL] FtrackApiClient session is None")
         else:
-            # Inject our session so get_component_path uses bootstrapped session
-            if hasattr(ftrack_utils_mod, "_ftrack_session"):
-                ftrack_utils_mod._ftrack_session = session  # type: ignore
-            path = ftrack_utils_mod.get_component_path(component)
-
-            if path is None or not str(path).strip():
-                _result(False, f"get_component_path => {path!r}")
-            else:
-                _result(True, f"path = {path[:100]}{'...' if len(str(path)) > 100 else ''}")
+            print(f"  Session: OK (same env as run_browser, locations registered)")
+            print()
+            print("  --- get_component_location_info(component_id) ---")
+            info = client.get_component_location_info(component_id)
+            print(f"    path: {info.get('path', '')!r}")
+            print(f"    availability: {info.get('availability')}%")
+            print(f"    location_name: {info.get('location_name')!r}")
+            print(f"    location_id: {info.get('location_id')!r}")
+            print(f"    transfer_ready: {info.get('transfer_ready')}")
     except Exception as e:
-        _result(False, f"ftrack_utils.get_component_path failed: {e}")
+        print(f"  [FAIL] {e}")
         import traceback
         traceback.print_exc()
 
     print()
-    print("=" * 80)
-    print("  SUMMARY")
-    print("=" * 80)
-    print("  If pick_location returns ftrack.unmanaged but component is in burlin.local/s3:")
-    print("  -> Finput fails because it uses pick_location + get_filesystem_path.")
-    print("  -> Fix: iterate over locations with availability>0, use first that returns path.")
-    print()
-    print("  If burlin.local has accessor=None/Symbol:")
-    print("  -> User location plugin may not be fully configured in standalone mode.")
-    print("  -> In Houdini/Connect the accessor is set by the plugin.")
     print("=" * 80)
     session.close()
     return 0
