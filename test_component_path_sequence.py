@@ -262,6 +262,23 @@ def main() -> int:
             print(f"    pick_location: EXCEPTION {e}")
 
         print()
+        print("  --- Step 2a: component_locations — availability and accessor on this host ---")
+        try:
+            comp_loc_names = {cl.get("location", {}).get("name") for cl in (component.get("component_locations") or []) if cl.get("location")}
+            for loc in session.query("Location").all():
+                if loc.get("name") not in comp_loc_names:
+                    continue
+                try:
+                    a = loc.get_component_availability(component)
+                    acc = getattr(loc, "accessor", None)
+                    has_gfp = acc and hasattr(acc, "get_filesystem_path")
+                    in_fallback = a >= 100.0 and has_gfp
+                    print(f"    {loc['name']!r}: availability={a}%, accessor_ok={has_gfp} -> in_fallback={in_fallback}")
+                except Exception as ex:
+                    print(f"    {loc['name']!r}: EXCEPTION {ex}")
+        except Exception as e:
+            print(f"    EXCEPTION: {e}")
+        print()
         print("  --- Step 2: fallback — locations with 100% availability ---")
         try:
             all_locs = session.query("Location").all()
