@@ -264,6 +264,12 @@ def main() -> int:
         print()
         print("  --- Step 2a: component_locations — availability and accessor on this host ---")
         try:
+            def _accessor_has_gfp(acc):
+                if acc is None:
+                    return False
+                if "Symbol" in type(acc).__name__ or "symbol" in str(type(acc)).lower():
+                    return False
+                return bool(hasattr(acc, "get_filesystem_path"))
             comp_loc_names = {cl.get("location", {}).get("name") for cl in (component.get("component_locations") or []) if cl.get("location")}
             for loc in session.query("Location").all():
                 if loc.get("name") not in comp_loc_names:
@@ -271,7 +277,7 @@ def main() -> int:
                 try:
                     a = loc.get_component_availability(component)
                     acc = getattr(loc, "accessor", None)
-                    has_gfp = acc and hasattr(acc, "get_filesystem_path")
+                    has_gfp = _accessor_has_gfp(acc)
                     in_fallback = a >= 100.0 and has_gfp
                     print(f"    {loc['name']!r}: availability={a}%, accessor_ok={has_gfp} -> in_fallback={in_fallback}")
                 except Exception as ex:
