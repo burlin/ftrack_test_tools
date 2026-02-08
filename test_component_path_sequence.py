@@ -125,16 +125,35 @@ def main() -> int:
     print(f"  Project root: {_project_root}")
     print()
 
-    # Session — same as browser: create then add locations (FtrackApiClient does this)
+    # Session — same as browser: create then add locations (no Qt/browser import)
     try:
         session = ftrack_api.Session(auto_connect_event_hub=True)
-        # Load locations like run_browser / FtrackApiClient (multi-site S3 + user disk)
+        # Register multi-site locations (same logic as simple_api_client._add_locations_if_available)
+        _multi_site = _project_root / "ftrack_plugins" / "multi-site-location-0.2.0"
+        _hook_locations = _multi_site / "hook" / "locations"
+        if _hook_locations.is_dir() and str(_hook_locations) not in sys.path:
+            sys.path.insert(0, str(_hook_locations))
         try:
-            from ftrack_inout.browser.simple_api_client import _add_locations_if_available
-            _add_locations_if_available(session)
-            print("[run_browser] Locations registered via _add_locations_if_available")
+            import s3_location_plugin  # type: ignore
+            import user_location_plugin  # type: ignore
+            try:
+                if _multi_site.joinpath(".env").is_file():
+                    try:
+                        from dotenv import load_dotenv
+                        load_dotenv(_multi_site / ".env")
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+            s3_location_plugin.session_add_s3_location(session)
+            location_setup = user_location_plugin.load_location_config(
+                config_path=_hook_locations / "disk_locations.yaml",
+                user_name=session.api_user,
+            )
+            user_location_plugin.session_add_user_location(session, location_setup)
+            print("[run_browser] Locations registered via multi-site plugins")
         except Exception as loc_err:
-            print(f"[WARN] _add_locations_if_available: {loc_err}")
+            print(f"[WARN] Multi-site locations: {loc_err}")
     except Exception as e:
         print(f"[FATAL] Failed to create session: {e}")
         import traceback
@@ -286,25 +305,35 @@ def main() -> int:
             import traceback
             traceback.print_exc()
 
-    # ─── BROWSER FLOW: FtrackApiClient.get_component_location_info ───
-    _section("BROWSER FLOW — FtrackApiClient.get_component_location_info (code from browser)")
+    # ─── BROWSER FLOW: get_component_location_info (same logic as simple_api_client) ───
+    _section("BROWSER FLOW — get_component_location_info (logic from browser, no Qt)")
 
     try:
-        from ftrack_inout.browser.simple_api_client import FtrackApiClient
-        client = FtrackApiClient(_enable_bulk_preload=False)
-        sess = client.get_session()
-        if not sess:
-            print("  [FAIL] FtrackApiClient session is None")
+        try:
+            component.get("version")
+        except Exception:
+            pass
+        location = session.pick_location()
+        if not location:
+            print("  pick_location: None")
+            print("  path: ''")
+            print("  availability: 0.0%")
         else:
-            print(f"  Session: OK (same env as run_browser, locations registered)")
-            print()
-            print("  --- get_component_location_info(component_id) ---")
-            info = client.get_component_location_info(component_id)
-            print(f"    path: {info.get('path', '')!r}")
-            print(f"    availability: {info.get('availability')}%")
-            print(f"    location_name: {info.get('location_name')!r}")
-            print(f"    location_id: {info.get('location_id')!r}")
-            print(f"    transfer_ready: {info.get('transfer_ready')}")
+            availability = location.get_component_availability(component)
+            path = ""
+            try:
+                path = location.get_filesystem_path(component)
+                if path is None:
+                    path = ""
+                path = (path or "").strip()
+                if path and "\\" in path:
+                    path = path.replace("\\", "/")
+            except Exception as e:
+                print(f"  get_filesystem_path: EXCEPTION {e}")
+            print(f"  pick_location: {location.get('name')!r} (id={location.get('id')})")
+            print(f"  path: {path!r}")
+            print(f"  availability: {availability}%")
+            print(f"  transfer_ready: {availability < 100.0 or not path or path.startswith('N/A')}")
     except Exception as e:
         print(f"  [FAIL] {e}")
         import traceback
