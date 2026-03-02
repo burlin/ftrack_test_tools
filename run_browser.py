@@ -154,13 +154,27 @@ def _bootstrap_environment(project_root: Path) -> None:
     """Initialize environment for standalone browser launch.
 
     Does only safe things:
+    - loads Ftrack credentials (Ftrack Connect config.json first, then .env);
     - pulls values from config/mroya.json if some variables are not yet set;
-    - loads .env files if possible (for FTRACK_* and S3 variables);
     - adds ftrack_plugins to sys.path and FTRACK_CONNECT_PLUGIN_PATH.
     """
 
-    # 1) Load credentials from config/.env (FTRACK_*, S3, etc.)
-    _load_dotenv_if_available(project_root / "config" / ".env")
+    # 0) Add ftrack_plugins to path so we can import credentials_loader
+    plugins_root = project_root / "ftrack_plugins"
+    if plugins_root.is_dir() and str(plugins_root) not in sys.path:
+        sys.path.insert(0, str(plugins_root))
+
+    # 1) Load credentials: Ftrack Connect path first, then config/.env
+    try:
+        from ftrack_inout.common.credentials_loader import load_ftrack_credentials_into_env
+        dotenv_paths = [
+            project_root / "config" / ".env",
+            project_root / ".env",
+        ]
+        if load_ftrack_credentials_into_env(prefer_connect=True, dotenv_paths=dotenv_paths):
+            print("[run_browser] Loaded Ftrack credentials (Connect path or .env)")
+    except ImportError:
+        _load_dotenv_if_available(project_root / "config" / ".env")
 
     # 2) Pull values from config/mroya.json (if exists).
     config_path = project_root / "config" / "mroya.json"
@@ -175,8 +189,7 @@ def _bootstrap_environment(project_root: Path) -> None:
         except Exception as exc:  # pragma: no cover - diagnostics
             print(f"[run_browser] Failed to read {config_path}: {exc}")
 
-    # 3) Ensure ftrack plugins path is available.
-    plugins_root = project_root / "ftrack_plugins"
+    # 3) Ensure ftrack plugins path is available (may already be in sys.path from step 0).
     if plugins_root.is_dir():
         os.environ.setdefault("FTRACK_CONNECT_PLUGIN_PATH", str(plugins_root))
         plugins_str = str(plugins_root)
