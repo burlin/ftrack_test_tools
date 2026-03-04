@@ -1,11 +1,12 @@
+"""
+Standalone launcher for the User Tasks widget.
+
+Uses the same environment bootstrap as run_browser.py. Integrates with:
+- common.session_factory.get_shared_session() - shared session with optimized cache
+- browser.simple_api_client.SimpleFtrackApiClient(session=...) - API client with shared session
+"""
+
 from __future__ import annotations
-
-"""
-Standalone launcher for the user tasks widget.
-
-Uses the same environment bootstrap as run_browser.py, but instead of
-main browser opens widget with list of current user's tasks.
-"""
 
 import sys
 from pathlib import Path
@@ -31,9 +32,11 @@ def main() -> None:
         sys.exit(1)
 
     try:
-        from ftrack_inout import browser as fbrowser  # type: ignore
+        from ftrack_inout.common.session_factory import get_shared_session
+        from ftrack_inout.browser.simple_api_client import SimpleFtrackApiClient
+        from ftrack_inout.browser.user_tasks_widget import UserTasksWidget
     except Exception as exc:
-        print(f"[run_user_tasks] Failed to import ftrack_inout.browser: {exc}")
+        print(f"[run_user_tasks] Failed to import ftrack_inout modules: {exc}")
         sys.exit(1)
 
     logging.basicConfig(
@@ -43,15 +46,20 @@ def main() -> None:
         force=True,
     )
 
-    if getattr(fbrowser, "UserTasksWidget", None) is None:
-        print("[run_user_tasks] UserTasksWidget is not available in ftrack_inout.browser")
+    # Use shared session (same cache as browser, Houdini, Maya)
+    session = get_shared_session()
+    if not session:
+        print("[run_user_tasks] ERROR: Could not create Ftrack session. Check FTRACK_* env vars.")
         sys.exit(1)
+
+    # API client with shared session - uses same cache, no duplicate session
+    api_client = SimpleFtrackApiClient(session=session)
 
     app = QtWidgets.QApplication.instance()
     if app is None:
         app = QtWidgets.QApplication(sys.argv)
 
-    widget = fbrowser.UserTasksWidget()  # type: ignore[call-arg]
+    widget = UserTasksWidget(api_client=api_client)
     widget.setWindowTitle("User Tasks - Mroya")
     widget.resize(900, 600)
     widget.show()

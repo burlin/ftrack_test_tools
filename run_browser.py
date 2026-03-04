@@ -257,8 +257,11 @@ def main() -> None:
         if app is None:
             app = QtWidgets.QApplication(sys.argv)
 
-        print("[run_browser] Creating FtrackBrowser widget...")
-        widget = FtrackBrowser()
+        # Standalone launcher always uses explicit DCC identifier.
+        dcc = "standalone"
+
+        print(f"[run_browser] Creating FtrackBrowser widget (dcc={dcc!r})...")
+        widget = FtrackBrowser(dcc=dcc)
         widget.show()
         print("[run_browser] [OK] Browser window opened")
 
