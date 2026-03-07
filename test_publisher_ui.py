@@ -114,21 +114,43 @@ def main():
     """Run the test application."""
     # Bootstrap environment (project_root set at module level)
     _bootstrap_environment(_project_root)
-    
+
+    # Load credentials from Ftrack Connect path if not set (same as run_browser)
+    try:
+        from ftrack_inout.common.credentials_loader import load_ftrack_credentials_into_env
+        load_ftrack_credentials_into_env(
+            prefer_connect=True,
+            dotenv_paths=[
+                _project_root / "config" / ".env",
+                _project_root / ".env",
+            ],
+        )
+    except ImportError:
+        pass
+
     # Check Ftrack session availability and create session if possible
     ftrack_session = None
     try:
         import ftrack_api
         print("[test_publisher] [OK] ftrack_api is available")
-        
-        # Try to create Ftrack session
+
+        # Prefer shared session (uses cache and credentials)
         try:
-            ftrack_session = ftrack_api.Session(auto_connect_event_hub=True)
-            print("[test_publisher] [OK] Ftrack session created successfully")
-        except Exception as e:
-            print(f"[test_publisher] [WARN] Failed to create Ftrack session: {e}")
-            print("[test_publisher] [INFO] Session requires FTRACK_SERVER, FTRACK_API_KEY, and FTRACK_API_USER")
-            print("[test_publisher] [INFO] Some features may not work without Ftrack session")
+            from ftrack_inout.common.session_factory import get_shared_session
+            ftrack_session = get_shared_session()
+            if ftrack_session:
+                print("[test_publisher] [OK] Ftrack session from session_factory")
+        except ImportError:
+            pass
+
+        if not ftrack_session:
+            try:
+                ftrack_session = ftrack_api.Session(auto_connect_event_hub=True)
+                print("[test_publisher] [OK] Ftrack session created successfully")
+            except Exception as e:
+                print(f"[test_publisher] [WARN] Failed to create Ftrack session: {e}")
+                print("[test_publisher] [INFO] Session requires FTRACK_SERVER, FTRACK_API_KEY, and FTRACK_API_USER")
+                print("[test_publisher] [INFO] Some features may not work without Ftrack session")
     except ImportError as e:
         print(f"[test_publisher] [WARN] ftrack_api not available: {e}")
         print("[test_publisher] Some features may not work without Ftrack session")
@@ -169,6 +191,8 @@ def main():
     print(f"✓ asset_name: {widget.get_parameter('asset_name')}")
     print(f"✓ use_snapshot: {widget.get_parameter('use_snapshot')}")
     print(f"✓ components: {widget.get_parameter('components')}")
+    tt = widget.get_parameter('transfer_target_location')
+    print(f"✓ transfer_target_location: {repr(tt)} (len={len(str(tt or ''))})")
     
     # Test JobBuilder and Publisher
     print("\n" + "=" * 60)
@@ -186,10 +210,11 @@ def main():
         print(f"  asset_name: {job.asset_name}")
         print(f"  asset_type: {job.asset_type}")
         print(f"  components: {len(job.components)}")
-        
+        print(f"  transfer_target_location: {repr(getattr(job, 'transfer_target_location', None))} (len={len(str(getattr(job, 'transfer_target_location') or ''))})")
         for i, comp in enumerate(job.components):
             status = "✓" if comp.export_enabled else "✗"
-            print(f"    [{status}] {comp.name} ({comp.component_type})")
+            transfer = getattr(comp, 'transfer_after_publish', None)
+            print(f"    [{status}] {comp.name} ({comp.component_type}) transfer_after_publish={transfer}")
         
         # Validate
         is_valid, errors = job.validate()
